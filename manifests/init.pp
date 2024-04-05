@@ -13,6 +13,10 @@
 # @param package_url
 #   URL of the Keycloak download.
 #   Default is based on version.
+# @param package_proxy_server
+#   proxy address to use when downloading package
+# @param package_proxy_type
+#   type of proxy server to use when downloading package (none|ftp|http|https)
 # @param install_dir
 #   The directory of where to install Keycloak.
 #   Default is `/opt/keycloak-${version}`.
@@ -224,6 +228,8 @@ class keycloak (
   Boolean $manage_install       = true,
   String $version               = '22.0.0',
   Optional[Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl, Stdlib::Absolutepath]] $package_url= undef,
+  Optional[String[1]] $package_proxy_server = undef,
+  Optional[Enum['none','ftp','http','https']] $package_proxy_type = undef,
   Optional[Stdlib::Absolutepath] $install_dir = undef,
   Array[String[1]] $java_package_dependencies = [],
   Enum['include','class'] $java_declare_method = 'class',

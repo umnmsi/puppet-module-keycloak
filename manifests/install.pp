@@ -41,6 +41,8 @@ class keycloak::install {
       cleanup         => true,
       user            => $keycloak::user,
       group           => $keycloak::group,
+      proxy_server    => $keycloak::package_proxy_server,
+      proxy_type      => $keycloak::package_proxy_type,
     }
   } else {
     # Set permissions properly when using a package
