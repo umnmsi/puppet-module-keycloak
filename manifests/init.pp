@@ -378,7 +378,7 @@ class keycloak (
       $validator_server = $config['http-host']
     }
   } else {
-    if $config['hostname'] in ['unset', 'UNSET'] {
+    if $hostname in ['unset', 'UNSET'] {
       $effective_hostname = $facts['networking']['fqdn']
     } else {
       $effective_hostname = $config['hostname']
