@@ -59,6 +59,11 @@ describe Puppet::Type.type(:keycloak_identity_provider) do
     expect(resource[:provider_id]).to eq('keycloak-oidc')
   end
 
+  it 'allows saml' do
+    config[:provider_id] = 'saml'
+    expect(resource[:provider_id]).to eq('saml')
+  end
+
   it 'does not allow invalid provider_id' do
     config[:provider_id] = 'foo'
     expect {
