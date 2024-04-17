@@ -56,6 +56,11 @@ Manage Keycloak client scopes
     defaultto :true
   end
 
+  newproperty(:type) do
+    desc 'Assigned type (none, optional, default)'
+    newvalues('none', 'optional', 'default')
+  end
+
   def self.title_patterns
     [
       [

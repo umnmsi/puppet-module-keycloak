@@ -36,11 +36,32 @@ Puppet::Type.type(:keycloak_client_scope).provide(:kcadm, parent: Puppet::Provid
     client_scopes
   end
 
+  def self.get_assigned_type(realm, id)
+    ['default', 'optional'].each do |type|
+      output = kcadm('get', "realms/#{realm}/default-#{type}-client-scopes")
+      Puppet.debug("Realms #{realm} #{type} client scopes: #{output}")
+      data = JSON.parse(output)
+      data.each do |d|
+        if d['id'] == id
+          Puppet.debug("Found assigned type '#{type}' for #{id}")
+          return type
+        end
+      end
+    end
+    Puppet.debug("Found assigned type 'none' for #{id}")
+    return 'none'
+  end
+
+  def get_assigned_type(*args)
+    self.class.get_client_scopes(*args)
+  end
+
   def self.prefetch(resources)
     client_scopes = instances
     resources.each_key do |name|
       provider = client_scopes.find { |c| c.resource_name == resources[name][:resource_name] && c.realm == resources[name][:realm] }
       if provider
+        provider.set(type: get_assigned_type(provider.realm, provider.id))
         resources[name].provider = provider
       end
     end
@@ -117,6 +138,9 @@ Puppet::Type.type(:keycloak_client_scope).provide(:kcadm, parent: Puppet::Provid
         kcadm('update', "client-scopes/#{id}", resource[:realm], t.path)
       rescue Puppet::ExecutionFailure => e
         raise Puppet::Error, "kcadm update client-scope failed\nError message: #{e.message}"
+      end
+      if @property_flush[:type]
+        Puppet.debug("Flushing assigned type")
       end
     end
     # Collect the resources again once they've been changed (that way `puppet
