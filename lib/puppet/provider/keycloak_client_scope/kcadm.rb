@@ -119,7 +119,7 @@ Puppet::Type.type(:keycloak_client_scope).provide(:kcadm, parent: Puppet::Provid
   end
 
   def flush
-    unless @property_flush.empty?
+    unless @property_flush.empty? or @property_flush.keys == [:type]
       raise(Puppet::Error, "Realm is mandatory for #{resource.type} #{resource.name}") if resource[:realm].nil?
 
       data = {}
@@ -139,9 +139,9 @@ Puppet::Type.type(:keycloak_client_scope).provide(:kcadm, parent: Puppet::Provid
       rescue Puppet::ExecutionFailure => e
         raise Puppet::Error, "kcadm update client-scope failed\nError message: #{e.message}"
       end
-      if @property_flush[:type]
-        Puppet.debug("Flushing assigned type")
-      end
+    end
+    if @property_flush[:type]
+      Puppet.debug("Flushing assigned type")
     end
     # Collect the resources again once they've been changed (that way `puppet
     # resource` will show the correct values after changes have been made).
