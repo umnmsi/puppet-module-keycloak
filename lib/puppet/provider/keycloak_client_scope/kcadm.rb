@@ -141,7 +141,21 @@ Puppet::Type.type(:keycloak_client_scope).provide(:kcadm, parent: Puppet::Provid
       end
     end
     if @property_flush[:type]
-      Puppet.debug("Flushing assigned type")
+      Puppet.debug("Flushing assigned type - changing #{@property_hash[:type]} to #{@property_flush[:type]}, resource[:type] = #{resource[:type]}")
+      if ['default', 'optional'].include? @property_hash[:type]
+        begin
+          kcadm('delete', "realms/#{resource[:realm]}/default-#{@property_hash[:type]}-client-scopes/#{id}")
+        rescue Puppet::ExecutionFailure => e
+          raise Puppet::Error, "kcadm delete realms/#{resource[:realm]}/default-#{@property_hash[:type]}-client-scopes/#{id}: #{e.message}"
+        end
+      end
+      if ['default', 'optional'].include? @property_flush[:type]
+        begin
+          kcadm('update', "realms/#{resource[:realm]}/default-#{@property_flush[:type]}-client-scopes/#{id}")
+        rescue Puppet::ExecutionFailure => e
+          raise Puppet::Error, "kcadm update realms/#{resource[:realm]}/default-#{@property_flush[:type]}-client-scopes/#{id}: #{e.message}"
+        end
+      end
     end
     # Collect the resources again once they've been changed (that way `puppet
     # resource` will show the correct values after changes have been made).
