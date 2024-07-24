@@ -20,7 +20,8 @@ Puppet::Type.type(:keycloak_client).provide(:kcadm, parent: Puppet::Provider::Ke
       :saml_assertion_signature,
       :saml_signing_certificate,
       :saml_encryption_certificate,
-      :saml_signing_private_key
+      :saml_signing_private_key,
+      :post_logout_redirect_uris
     ]
   end
 
@@ -32,7 +33,8 @@ Puppet::Type.type(:keycloak_client).provide(:kcadm, parent: Puppet::Provider::Ke
       :saml_assertion_signature,
       :saml_signing_certificate,
       :saml_encryption_certificate,
-      :saml_signing_private_key
+      :saml_signing_private_key,
+      :post_logout_redirect_uris
     ]
   end
 

@@ -168,6 +168,10 @@ Manage Keycloak clients
     desc 'backchannel.logout.url'
   end
 
+  newproperty(:post_logout_redirect_uris) do
+    desc 'post.logout.redirect.uris. Separate multiple values with ##.'
+  end
+
   newproperty(:saml_name_id_format) do
     desc 'saml_name_id_format'
   end
