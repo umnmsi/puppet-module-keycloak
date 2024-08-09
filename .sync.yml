@@ -25,16 +25,16 @@ Rakefile:
       - puppet7
       - puppet8
     keycloak_version:
-      - '22.0.0'
+      - '25.0.1'
     keycloak_full: ['no']
   acceptance_includes:
     - set: el8
       puppet: puppet7
-      keycloak_version: 22.0.0
+      keycloak_version: '25.0.1'
       keycloak_full: 'yes'
     - set: el8
       puppet: puppet8
-      keycloak_version: 22.0.0
+      keycloak_version: '25.0.1'
       keycloak_full: 'yes'
 .gitignore:
   paths:
@@ -52,11 +52,11 @@ appveyor.yml:
   delete: true
 spec/acceptance/nodesets/el7.yml:
   delete: true
-spec/acceptance/nodesets/debian-10.yml:
-  delete: true
 spec/acceptance/nodesets/debian-11.yml:
   packages:
     - iproute2
+spec/acceptance/nodesets/debian-12.yml:
+  delete: true
 spec/acceptance/nodesets/ubuntu-2004.yml:
   packages:
     - iproute2

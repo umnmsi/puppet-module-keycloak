@@ -185,7 +185,7 @@ Data type: `String`
 
 Version of Keycloak to install and manage.
 
-Default value: `'22.0.0'`
+Default value: `'25.0.1'`
 
 ##### <a name="-keycloak--package_url"></a>`package_url`
 
@@ -230,7 +230,7 @@ Data type: `String[1]`
 
 Java package name, only used when `java_declare_method` is `class`
 
-Default value: `'java-17-openjdk-devel'`
+Default value: `'java-21-openjdk-devel'`
 
 ##### <a name="-keycloak--java_home"></a>`java_home`
 
@@ -239,7 +239,7 @@ Data type: `Stdlib::Absolutepath`
 Java home path.  This value is used when `java_declare_method` is `class`
 as well as to set JAVA_HOME environment variable for the Keycloak service.
 
-Default value: `'/usr/lib/jvm/java-17-openjdk'`
+Default value: `'/usr/lib/jvm/java-21-openjdk'`
 
 ##### <a name="-keycloak--java_alternative_path"></a>`java_alternative_path`
 
@@ -247,7 +247,7 @@ Data type: `Stdlib::Absolutepath`
 
 Java alternative path, only used when `java_declare_method` is `class`
 
-Default value: `'/usr/lib/jvm/java-17-openjdk/bin/java'`
+Default value: `'/usr/lib/jvm/java-21-openjdk/bin/java'`
 
 ##### <a name="-keycloak--java_alternative"></a>`java_alternative`
 
@@ -255,7 +255,7 @@ Data type: `String[1]`
 
 Java alternative, only used when `java_declare_method` is `class`
 
-Default value: `'/usr/lib/jvm/java-17-openjdk/bin/java'`
+Default value: `'/usr/lib/jvm/java-21-openjdk/bin/java'`
 
 ##### <a name="-keycloak--service_name"></a>`service_name`
 
@@ -358,7 +358,7 @@ Default value: `{}`
 
 ##### <a name="-keycloak--hostname"></a>`hostname`
 
-Data type: `Variant[Stdlib::Host, Enum['unset','UNSET']]`
+Data type: `Variant[Stdlib::Host, Stdlib::HTTPUrl, Stdlib::HTTPSUrl, Enum['unset','UNSET']]`
 
 hostname to set in keycloak.conf
 Set to `unset` or `UNSET` to not define this in keycloak.conf
@@ -1729,8 +1729,6 @@ Default value: `true`
 
 webOrigins
 
-Default value: `[]`
-
 #### Parameters
 
 The following parameters are available in the `keycloak_client` type.
@@ -2081,8 +2079,8 @@ Manage a Keycloak flow
 **Autorequires**
 * `keycloak_realm` defined for `realm` parameter
 * `keycloak_flow` of `flow_alias` if `top_level=false`
-* `keycloak_flow` of `flow_alias` if other `index` is lower and if `top_level=false`
-* `keycloak_flow_execution` if `flow_alias` is the same and other `index` is lower and if `top_level=false`
+* `keycloak_flow` of `flow_alias` if other `priority` is lower and if `top_level=false`
+* `keycloak_flow_execution` if `flow_alias` is the same and other `priority` is lower and if `top_level=false`
 
 #### Examples
 
@@ -2100,7 +2098,7 @@ keycloak_flow { 'browser-with-duo':
 ```puppet
 keycloak_flow { 'form-browser-with-duo under browser-with-duo on test':
   ensure      => 'present',
-  index       => 2,
+  priority    => 20,
   requirement => 'ALTERNATIVE',
   top_level   => false,
 }
@@ -2122,9 +2120,9 @@ The basic property that the resource should be in.
 
 Default value: `present`
 
-##### `index`
+##### `priority`
 
-execution index, only applied to top_level=false, required for top_level=false
+execution priority, only applied to top_level=false, required for top_level=false
 
 ##### `requirement`
 
@@ -2200,8 +2198,8 @@ Manage a Keycloak flow
 **Autorequires**
 * `keycloak_realm` defined for `realm` parameter
 * `keycloak_flow` of value defined for `flow_alias`
-* `keycloak_flow` if they share same `flow_alias` value and the other resource `index` is lower
-* `keycloak_flow_execution` if `flow_alias` is the same and other `index` is lower
+* `keycloak_flow` if they share same `flow_alias` value and the other resource `priority` is lower
+* `keycloak_flow_execution` if `flow_alias` is the same and other `priority` is lower
 
 #### Examples
 
@@ -2212,7 +2210,7 @@ keycloak_flow_execution { 'auth-cookie under browser-with-duo on test':
   ensure       => 'present',
   configurable => false,
   display_name => 'Cookie',
-  index        => 0,
+  priority     => 10,
   requirement  => 'ALTERNATIVE',
 }
 ```
@@ -2224,7 +2222,7 @@ keycloak_flow_execution { 'auth-username-password-form under form-browser-with-d
   ensure       => 'present',
   configurable => false,
   display_name => 'Username Password Form',
-  index        => 0,
+  priority     => 10,
   requirement  => 'REQUIRED',
 }
 ```
@@ -2245,7 +2243,7 @@ keycloak_flow_execution { 'duo-mfa-authenticator under form-browser-with-duo on 
     "duomfa.groups"  => "duo"
   },
   requirement  => 'REQUIRED',
-  index        => 1,
+  priority     => 20,
 }
 ```
 
@@ -2271,9 +2269,9 @@ The basic property that the resource should be in.
 
 Default value: `present`
 
-##### `index`
+##### `priority`
 
-execution index
+execution priority
 
 ##### `requirement`
 
@@ -2685,6 +2683,8 @@ ldap.attribute
 ##### `mapped_group_attributes`
 
 mapped.group.attributes, only for `type` of `group-ldap-mapper`
+
+Default value: `absent`
 
 ##### `memberof_ldap_attribute`
 
@@ -3379,6 +3379,12 @@ eventsListeners
 
 Default value: `['jboss-logging']`
 
+##### `failure_factor`
+
+failureFactor
+
+Default value: `30`
+
 ##### `internationalization_enabled`
 
 Valid values: `true`, `false`
@@ -3401,6 +3407,24 @@ loginWithEmailAllowed
 
 Default value: `true`
 
+##### `max_delta_time_seconds`
+
+maxDeltaTimeSeconds
+
+Default value: `43_200`
+
+##### `max_failure_wait_seconds`
+
+maxFailureWaitSeconds
+
+Default value: `900`
+
+##### `minimum_quick_login_wait_seconds`
+
+minimumQuickLoginWaitSeconds
+
+Default value: `60`
+
 ##### `offline_session_idle_timeout`
 
 offlineSessionIdleTimeout
@@ -3420,6 +3444,74 @@ Default value: `false`
 ##### `optional_client_scopes`
 
 Optional Client Scopes
+
+##### `otp_policy_algorithm`
+
+Valid values: `HmacSHA1`, `HmacSHA256`, `HmacSHA512`
+
+otpPolicyAlgorithm
+
+Default value: `HmacSHA1`
+
+##### `otp_policy_code_reusable`
+
+Valid values: `true`, `false`
+
+otpPolicyCodeReusable
+
+Default value: `false`
+
+##### `otp_policy_digits`
+
+Valid values: `6`, `8`
+
+otpPolicyDigits
+
+Default value: `6`
+
+##### `otp_policy_initial_counter`
+
+otpPolicyInitialCounter
+
+Default value: `0`
+
+##### `otp_policy_look_ahead_window`
+
+otpPolicyLookAheadWindow
+
+Default value: `1`
+
+##### `otp_policy_period`
+
+otpPolicyPeriod
+
+Default value: `30`
+
+##### `otp_policy_type`
+
+Valid values: `totp`, `hotp`
+
+otpPolicyType
+
+Default value: `totp`
+
+##### `password_policy`
+
+passwordPolicy
+
+##### `permanent_lockout`
+
+Valid values: `true`, `false`
+
+permanentLockout
+
+Default value: `false`
+
+##### `quick_login_check_milli_seconds`
+
+quickLoginCheckMilliSeconds
+
+Default value: `1_000`
 
 ##### `registration_allowed`
 
@@ -3560,6 +3652,164 @@ Valid values: `true`, `false`
 verifyEmail
 
 Default value: `false`
+
+##### `wait_increment_seconds`
+
+waitIncrementSeconds
+
+Default value: `60`
+
+##### `web_authn_policy_acceptable_aaguids`
+
+webAuthnPolicyAcceptableAaguids
+
+Default value: `[]`
+
+##### `web_authn_policy_attestation_conveyance_preference`
+
+Valid values: `none`, `direct`, `indirect`, `not specified`
+
+webAuthnPolicyAttestationConveyancePreference
+
+Default value: `not specified`
+
+##### `web_authn_policy_authenticator_attachment`
+
+Valid values: `platform`, `cross-platform`, `not specified`
+
+webAuthnPolicyAuthenticatorAttachment
+
+Default value: `not specified`
+
+##### `web_authn_policy_avoid_same_authenticator_register`
+
+Valid values: `true`, `false`
+
+webAuthnPolicyAvoidSameAuthenticatorRegister
+
+Default value: `false`
+
+##### `web_authn_policy_create_timeout`
+
+webAuthnPolicyCreateTimeout
+
+Default value: `0`
+
+##### `web_authn_policy_extra_origins`
+
+webAuthnPolicyExtraOrigins
+
+Default value: `[]`
+
+##### `web_authn_policy_passwordless_acceptable_aaguids`
+
+webAuthnPolicyPasswordlessAcceptableAaguids
+
+Default value: `[]`
+
+##### `web_authn_policy_passwordless_attestation_conveyance_preference`
+
+Valid values: `none`, `direct`, `indirect`, `not specified`
+
+webAuthnPolicyPasswordlessAttestationConveyancePreference
+
+Default value: `not specified`
+
+##### `web_authn_policy_passwordless_authenticator_attachment`
+
+Valid values: `platform`, `cross-platform`, `not specified`
+
+webAuthnPolicyPasswordlessAuthenticatorAttachment
+
+Default value: `not specified`
+
+##### `web_authn_policy_passwordless_avoid_same_authenticator_register`
+
+Valid values: `true`, `false`
+
+webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister
+
+Default value: `false`
+
+##### `web_authn_policy_passwordless_create_timeout`
+
+webAuthnPolicyPasswordlessCreateTimeout
+
+Default value: `0`
+
+##### `web_authn_policy_passwordless_extra_origins`
+
+webAuthnPolicyPasswordlessExtraOrigins
+
+Default value: `[]`
+
+##### `web_authn_policy_passwordless_require_resident_key`
+
+Valid values: `No`, `Yes`, `not specified`
+
+webAuthnPolicyPasswordlessRequireResidentKey
+
+Default value: `not specified`
+
+##### `web_authn_policy_passwordless_rp_entity_name`
+
+webAuthnPolicyPasswordlessRpEntityName
+
+Default value: `keycloak`
+
+##### `web_authn_policy_passwordless_rp_id`
+
+webAuthnPolicyPasswordlessRpId
+
+Default value: `''`
+
+##### `web_authn_policy_passwordless_signature_algorithms`
+
+webAuthnPolicyPasswordlessSignatureAlgorithms
+
+Default value: `['ES256']`
+
+##### `web_authn_policy_passwordless_user_verification_requirement`
+
+Valid values: `required`, `preferred`, `discouraged`, `not specified`
+
+webAuthnPolicyPasswordlessUserVerificationRequirement
+
+Default value: `not specified`
+
+##### `web_authn_policy_require_resident_key`
+
+Valid values: `No`, `Yes`, `not specified`
+
+webAuthnPolicyRequireResidentKey
+
+Default value: `not specified`
+
+##### `web_authn_policy_rp_entity_name`
+
+webAuthnPolicyRpEntityName
+
+Default value: `keycloak`
+
+##### `web_authn_policy_rp_id`
+
+webAuthnPolicyRpId
+
+Default value: `''`
+
+##### `web_authn_policy_signature_algorithms`
+
+webAuthnPolicySignatureAlgorithms
+
+Default value: `['ES256']`
+
+##### `web_authn_policy_user_verification_requirement`
+
+Valid values: `required`, `preferred`, `discouraged`, `not specified`
+
+webAuthnPolicyUserVerificationRequirement
+
+Default value: `not specified`
 
 #### Parameters
 
@@ -3929,6 +4179,15 @@ Alias of
 Struct[{
     Optional['cache'] => Enum['local', 'ispn'],
     Optional['cache-config-file'] => String[1],
+    Optional['cache-embedded-mtls-enabled'] => Boolean,
+    Optional['cache-embedded-mtls-key-store-file'] => String[1],
+    Optional['cache-embedded-mtls-key-store-password'] => Variant[String[1], Sensitive],
+    Optional['cache-embedded-mtls-trust-store-file'] => String[1],
+    Optional['cache-embedded-mtls-trust-store-password'] => Variant[String[1], Sensitive],
+    Optional['cache-remote-host'] => Variant[Stdlib::Host, Stdlib::IP::Address],
+    Optional['cache-remote-password'] => Variant[String[1], Sensitive],
+    Optional['cache-remote-port'] => Stdlib::Port,
+    Optional['cache-remote-username'] => String[1],
     Optional['cache-stack'] => Enum['tcp','udp','kubernetes','ec2','azure','google'],
     Optional['db'] => Enum['dev-file','dev-mem','mariadb','mysql','oracle','postgres'],
     Optional['db-password'] => String[1],
@@ -3945,17 +4204,15 @@ Struct[{
     Optional['transaction-xa-enabled'] => Boolean,
     Optional['features'] => Array[String[1]],
     Optional['features-disabled'] => Array[String[1]],
-    Optional['hostname'] => Stdlib::Host,
-    Optional['hostname-admin'] => Stdlib::Host,
-    Optional['hostname-admin-url'] => String[1],
-    Optional['hostname-path'] => String[1],
-    Optional['hostname-port'] => Stdlib::Port,
+    Optional['hostname'] => Variant[Stdlib::Host, Stdlib::HTTPUrl, Stdlib::HTTPSUrl],
+    Optional['hostname-admin'] => Variant[Stdlib::HTTPUrl, Stdlib::HTTPSUrl],
+    Optional['hostname-backchannel-dynamic'] => Boolean,
+    Optional['hostname-debug'] => Boolean,
     Optional['hostname-strict'] => Boolean,
-    Optional['hostname-strict-backchannel'] => Boolean,
-    Optional['hostname-strict-https'] => Boolean,
-    Optional['hostname-url'] => String[1],
     Optional['http-enabled'] => Boolean,
     Optional['http-host'] => Stdlib::Host,
+    Optional['http-max-queued-requests'] => Integer,
+    Optional['http-pool-max-threads'] => Integer,
     Optional['http-port'] => Stdlib::Port,
     Optional['http-relative-path'] => String[1],
     Optional['https-certificate-file'] => Stdlib::Absolutepath,
@@ -3963,26 +4220,32 @@ Struct[{
     Optional['https-cipher-suites'] => Array[String[1]],
     Optional['https-client-auth'] => Enum['none','request','required'],
     Optional['https-key-store-file'] => Stdlib::Absolutepath,
-    Optional['https-key-store-password'] => String[1],
+    Optional['https-key-store-password'] => Variant[String[1], Sensitive],
     Optional['https-key-store-type'] => String[1],
     Optional['https-port'] => Stdlib::Port,
     Optional['https-protocols'] => Array[String[1]],
     Optional['https-trust-store-file'] => Stdlib::Absolutepath,
-    Optional['https-trust-store-password'] => String[1],
+    Optional['https-trust-store-password'] => Variant[String[1], Sensitive],
     Optional['https-trust-store-type'] => String[1],
     Optional['health-enabled'] => Boolean,
+    Optional['config-keystore'] => String[1],
+    Optional['config-keystore-password'] => Variant[String[1], Sensitive],
+    Optional['config-keystore-type'] => Enum['PKCS12'],
     Optional['metrics-enabled'] => Boolean,
     Optional['proxy'] => Enum['edge','reencrypt','passthrough','none'],
-    Optional['vault'] => Enum['file','hashicorp'],
+    Optional['proxy-headers'] => Enum['forwarded', 'xforwarded'],
+    Optional['vault'] => Enum['file','keystore'],
     Optional['vault-dir'] => Stdlib::Absolutepath,
+    Optional['vault-file'] => Stdlib::Absolutepath,
+    Optional['vault-pass'] => Variant[String[1], Sensitive],
+    Optional['vault-type'] => Enum['PKCS12'],
     Optional['log'] => Array[Enum['console','file','gelf']],
     Optional['log-console-color'] => Boolean,
     Optional['log-console-format'] => String[1],
     Optional['log-console-output'] => Enum['default','json'],
-    Optional['log-file'] => Stdlib::Absolutepath,
+    Optional['log-file'] => String[1],
     Optional['log-file-format'] => String[1],
     Optional['log-file-output'] => Enum['default','json'],
-    Optional['log-level'] => String[1],
     Optional['log-gelf-facility'] => String[1],
     Optional['log-gelf-host'] => Stdlib::Host,
     Optional['log-gelf-include-location'] => Boolean,
@@ -3993,6 +4256,15 @@ Struct[{
     Optional['log-gelf-port'] => Stdlib::Port,
     Optional['log-gelf-timestamp-format'] => String[1],
     Optional['log-level'] => String[1],
+    Optional['tls-hostname-verifier'] => Enum['ANY','WILDCARD','STRICT'],
+    Optional['truststore-paths'] => Array[String[1]],
+    Optional['fips-mode'] => Enum['non-strict','strict'],
+    Optional['dir'] => Stdlib::Absolutepath,
+    Optional['realm'] => String[1],
+    Optional['users'] => Enum['skip','realm_file','same_file','different_files'],
+    Optional['users-per-file'] => Integer,
+    Optional['file'] => Stdlib::Absolutepath,
+    Optional['override'] => Boolean,
   }]
 ```
 
