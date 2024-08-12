@@ -79,7 +79,7 @@ Puppet::Type.type(:keycloak_ldap_user_provider).provide(:kcadm, parent: Puppet::
     data = {}
     data[:id] = resource[:id] || name_uuid(resource[:name])
     data[:name] = resource[:resource_name]
-    data[:parentId] = get_parent_id(resource[:realm]) || resource[:realm]
+    data[:parentId] = resource[:realm]
     data[:providerId] = 'ldap'
     data[:providerType] = 'org.keycloak.storage.UserStorageProvider'
     data[:config] = {}
