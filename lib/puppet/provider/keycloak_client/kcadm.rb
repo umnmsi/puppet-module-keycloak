@@ -93,7 +93,7 @@ Puppet::Type.type(:keycloak_client).provide(:kcadm, parent: Puppet::Provider::Ke
         # avoid built-in clients
         if d.key?('clientAuthenticatorType') &&
            d['clientAuthenticatorType'] == 'client-secret' &&
-           !d.key?('name')
+           (!d.key?('name') || d['name'] == '')
           begin
             secret_output = kcadm('get', "clients/#{d['id']}/client-secret", realm)
           rescue StandardError
