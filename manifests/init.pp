@@ -281,7 +281,7 @@ class keycloak (
   Boolean $truststore = false,
   Hash $truststore_hosts = {},
   String $truststore_password = 'keycloak',
-  Enum['edge','reencrypt','passthrough','none'] $proxy = 'none',
+  Enum['edge','reencrypt','passthrough','none','unset','UNSET'] $proxy = 'none',
   Hash $realms = {},
   Boolean $realms_merge = false,
   Hash $oidc_client_scopes = {},
