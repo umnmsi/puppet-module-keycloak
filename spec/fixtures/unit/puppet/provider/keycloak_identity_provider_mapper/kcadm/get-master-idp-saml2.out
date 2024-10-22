@@ -1,0 +1,32 @@
+[ {
+  "id" : "a65e63bd-1fa0-49d5-8cfc-d2711ac0aa0b",
+  "name" : "mail",
+  "identityProviderAlias" : "saml",
+  "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+  "config" : {
+    "syncMode" : "INHERIT",
+    "user.attribute" : "email",
+    "attribute.friendly.name" : "eduPersonPrincipalName",
+    "attribute.name.format" : "ATTRIBUTE_FORMAT_BASIC"
+  }
+}, {
+  "id" : "877240ce-0783-4987-aba4-2a7f0e075b85",
+  "name" : "First name",
+  "identityProviderAlias" : "saml",
+  "identityProviderMapper" : "hardcoded-attribute-idp-mapper",
+  "config" : {
+    "syncMode" : "INHERIT",
+    "attribute.value" : "firstName",
+    "attribute" : "firstName"
+  }
+}, {
+  "id" : "80d7451d-7b40-4c00-8275-8f3da1a9d886",
+  "name" : "Last name",
+  "identityProviderAlias" : "saml",
+  "identityProviderMapper" : "hardcoded-attribute-idp-mapper",
+  "config" : {
+    "syncMode" : "INHERIT",
+    "attribute.value" : "lastName",
+    "attribute" : "lastName"
+  }
+} ]

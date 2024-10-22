@@ -1,0 +1,31 @@
+[ {
+  "alias" : "saml",
+  "displayName" : "UMN Shibboleth IdP (MSI-only)",
+  "internalId" : "saml-msi",
+  "providerId" : "saml",
+  "enabled" : true,
+  "updateProfileFirstLoginMode" : "on",
+  "trustEmail" : false,
+  "storeToken" : false,
+  "addReadTokenRoleOnCreate" : false,
+  "authenticateByDefault" : false,
+  "linkOnly" : false,
+  "firstBrokerLoginFlowAlias" : "first-broker-login-msi-only",
+  "config" : {
+    "hideOnLoginPage" : "false",
+    "validateSignature" : "false",
+    "postBindingResponse" : "true",
+    "nameIDPolicyFormat" : "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+    "principalAttribute" : "uid",
+    "entityId" : "https://keycloak-dev.msi.umn.edu:8443/realms/msi",
+    "backchannelSupported" : "false",
+    "idpEntityId" : "https://idp-test.shib.umn.edu/idp/shibboleth",
+    "loginHint" : "false",
+    "metadataDescriptorUrl" : "https://login-test.umn.edu/idp/shibboleth",
+    "syncMode" : "IMPORT",
+    "authnContextComparisonType" : "exact",
+    "postBindingAuthnRequest" : "true",
+    "singleSignOnServiceUrl" : "https://login-test.umn.edu/idp/profile/SAML2/POST/SSO",
+    "principalType" : "FRIENDLY_ATTRIBUTE"
+  }
+} ]

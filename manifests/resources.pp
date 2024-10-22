@@ -33,6 +33,11 @@ class keycloak::resources {
   } else {
     $identity_providers = $keycloak::identity_providers
   }
+  if $keycloak::identity_provider_mappers_merge {
+    $identity_provider_mappers = lookup('keycloak::identity_provider_mappers', Hash, 'deep', {})
+  } else {
+    $identity_provider_mappers = $keycloak::identity_provider_mappers
+  }
   if $keycloak::clients_merge {
     $clients = lookup('keycloak::clients', Hash, 'deep', {})
   } else {
@@ -84,6 +89,9 @@ class keycloak::resources {
   }
   $identity_providers.each |$name, $data| {
     keycloak_identity_provider { $name: * => $data }
+  }
+  $identity_provider_mappers.each |$name, $data| {
+    keycloak_identity_provider_mapper { $name: * => $data }
   }
   $clients.each |$name, $data| {
     keycloak_client { $name: * => $data }
