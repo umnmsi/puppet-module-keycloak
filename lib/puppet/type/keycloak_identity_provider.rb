@@ -65,7 +65,7 @@ Manage Keycloak identity providers
       force_authn: ['saml'],
       attribute_consuming_service_index: ['saml'],
       add_extensions_element_with_key_info: ['saml'],
-      principal_type: ['saml'],
+      principal_type: ['saml']
     }
   end
 
@@ -78,7 +78,7 @@ Manage Keycloak identity providers
     desc 'The identity provider name'
   end
 
-  newparam(:alias, namevar: true) do
+  newparam(:idp_alias, namevar: true) do
     desc 'The identity provider name. Defaults to `name`.'
     defaultto do
       @resource[:name]
@@ -86,9 +86,9 @@ Manage Keycloak identity providers
   end
 
   newparam(:internal_id) do
-    desc 'internalId. Defaults to "`alias`-`realm`"'
+    desc 'internalId. Defaults to "`idp_alias`-`realm`"'
     defaultto do
-      "#{@resource[:alias]}-#{@resource[:realm]}"
+      "#{@resource[:idp_alias]}-#{@resource[:realm]}"
     end
   end
 
@@ -424,7 +424,7 @@ Manage Keycloak identity providers
         %r{^((\S+) on (\S+))$},
         [
           [:name],
-          [:alias],
+          [:idp_alias],
           [:realm]
         ]
       ],
@@ -456,7 +456,7 @@ Manage Keycloak identity providers
         raise Puppet::Error, 'client_secret is required'
       end
     end
-    parameters.each do |parameter, obj|
+    parameters.each do |parameter, _obj|
       # Remove default values for alternate providers
       @parameters.delete(parameter) if property_map.key?(parameter.to_sym) && !property_map[parameter.to_sym].include?(self[:provider_id])
     end

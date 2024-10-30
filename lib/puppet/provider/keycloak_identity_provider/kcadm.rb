@@ -30,9 +30,9 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
         provider = {}
         provider[:ensure] = :present
         provider[:internal_id] = d['internalId']
-        provider[:alias] = d['alias']
+        provider[:idp_alias] = d['alias']
         provider[:realm] = realm
-        provider[:name] = "#{provider[:alias]} on #{provider[:realm]}"
+        provider[:name] = "#{provider[:idp_alias]} on #{provider[:realm]}"
         provider[:provider_id] = d['providerId']
         type_properties.each do |property|
           key = camelize(property)
@@ -59,7 +59,7 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
   def self.prefetch(resources)
     providers = instances
     resources.each_key do |name|
-      provider = providers.find { |c| c.alias == resources[name][:alias] && c.realm == resources[name][:realm] }
+      provider = providers.find { |c| c.idp_alias == resources[name][:idp_alias] && c.realm == resources[name][:realm] }
       if provider
         resources[name].provider = provider
       end
@@ -70,7 +70,7 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
     raise(Puppet::Error, "Realm is mandatory for #{resource.type} #{resource.name}") if resource[:realm].nil?
 
     data = {}
-    data[:alias] = resource[:alias]
+    data[:alias] = resource[:idp_alias]
     data[:internalId] = resource[:internal_id]
     data[:providerId] = resource[:provider_id]
     data[:config] = {}
@@ -107,7 +107,7 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
     raise(Puppet::Error, "Realm is mandatory for #{resource.type} #{resource.name}") if resource[:realm].nil?
 
     begin
-      kcadm('delete', "identity-provider/instances/#{resource[:alias]}", resource[:realm])
+      kcadm('delete', "identity-provider/instances/#{resource[:idp_alias]}", resource[:realm])
     rescue Puppet::ExecutionFailure => e
       raise Puppet::Error, "kcadm delete realm failed\nError message: #{e.message}"
     end
@@ -135,7 +135,7 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
       raise(Puppet::Error, "Realm is mandatory for #{resource.type} #{resource.name}") if resource[:realm].nil?
 
       data = {}
-      data[:alias] = resource[:alias]
+      data[:alias] = resource[:idp_alias]
       data[:internalId] = resource[:internal_id]
       data[:providerId] = resource[:provider_id]
       data[:config] = {}
@@ -158,7 +158,7 @@ Puppet::Type.type(:keycloak_identity_provider).provide(:kcadm, parent: Puppet::P
       t.close
       Puppet.debug(IO.read(t.path))
       begin
-        kcadm('update', "identity-provider/instances/#{resource[:alias]}", resource[:realm], t.path)
+        kcadm('update', "identity-provider/instances/#{resource[:idp_alias]}", resource[:realm], t.path)
       rescue Puppet::ExecutionFailure => e
         raise Puppet::Error, "kcadm update identity-provider failed\nError message: #{e.message}"
       end
