@@ -81,7 +81,7 @@ Manage Keycloak Identity Provider mappers
     catalog.resources.each do |resource|
       next unless resource.instance_of?(Puppet::Type::Keycloak_identity_provider)
 
-      if self[:identity_provider] == resource[:alias] && self[:realm] == resource[:realm]
+      if self[:identity_provider] == resource[:idp_alias] && self[:realm] == resource[:realm]
         requires << resource.name
       end
     end

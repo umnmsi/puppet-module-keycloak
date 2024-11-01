@@ -456,7 +456,7 @@ Manage Keycloak identity providers
         raise Puppet::Error, 'client_secret is required'
       end
     end
-    parameters.each do |parameter, _obj|
+    parameters.each_key do |parameter|
       # Remove default values for alternate providers
       @parameters.delete(parameter) if property_map.key?(parameter.to_sym) && !property_map[parameter.to_sym].include?(self[:provider_id])
     end
