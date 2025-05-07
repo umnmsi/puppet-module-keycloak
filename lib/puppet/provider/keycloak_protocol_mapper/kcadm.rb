@@ -7,6 +7,15 @@ Puppet::Type.type(:keycloak_protocol_mapper).provide(:kcadm, parent: Puppet::Pro
 
   mk_resource_methods
 
+  def client_scope_name_to_id(name, realm)
+    client_scopes_output = kcadm('get', 'client-scopes', realm)
+    client_scope_data = JSON.parse(client_scopes_output)
+    client_scope_data.each do |client_scope|
+      return client_scope['id'] if client_scope['name'] == name
+    end
+    raise(Puppet::Error, "Failed to find client scope #{name} in realm #{realm}")
+  end
+
   def self.attribute_nameformat_map
     {
       uri: 'URI Reference',
@@ -29,14 +38,14 @@ Puppet::Type.type(:keycloak_protocol_mapper).provide(:kcadm, parent: Puppet::Pro
       client_scopes_output = kcadm('get', 'client-scopes', realm)
       client_scope_data = JSON.parse(client_scopes_output)
       client_scope_data.each do |client_scope|
-        client_scope_id = client_scope['id']
+        client_scope_name = client_scope['name']
         data = client_scope['protocolMappers'] || []
         data.each do |d|
           protocol_mapper = {}
           protocol_mapper[:ensure] = :present
           protocol_mapper[:id] = d['id']
           protocol_mapper[:realm] = realm
-          protocol_mapper[:client_scope] = client_scope_id
+          protocol_mapper[:client_scope] = client_scope_name
           protocol_mapper[:resource_name] = d['name']
           protocol_mapper[:protocol] = d['protocol']
           protocol_mapper[:name] = "#{protocol_mapper[:resource_name]} for #{protocol_mapper[:client_scope]} on #{protocol_mapper[:realm]}"
@@ -139,7 +148,7 @@ Puppet::Type.type(:keycloak_protocol_mapper).provide(:kcadm, parent: Puppet::Pro
     t.close
     Puppet.debug(IO.read(t.path))
     begin
-      kcadm('create', "client-scopes/#{resource[:client_scope]}/protocol-mappers/models", resource[:realm], t.path)
+      kcadm('create', "client-scopes/#{client_scope_name_to_id(resource[:client_scope], resource[:realm])}/protocol-mappers/models", resource[:realm], t.path)
     rescue Puppet::ExecutionFailure => e
       raise Puppet::Error, "kcadm create protocol-mapper failed\nError message: #{e.message}"
     end
@@ -151,7 +160,7 @@ Puppet::Type.type(:keycloak_protocol_mapper).provide(:kcadm, parent: Puppet::Pro
     raise(Puppet::Error, "Client scope is mandatory for #{resource.type} #{resource.name}") if resource[:client_scope].nil?
 
     begin
-      kcadm('delete', "client-scopes/#{resource[:client_scope]}/protocol-mappers/models/#{id}", resource[:realm])
+      kcadm('delete', "client-scopes/#{client_scope_name_to_id(resource[:client_scope], resource[:realm])}/protocol-mappers/models/#{id}", resource[:realm])
     rescue Puppet::ExecutionFailure => e
       raise Puppet::Error, "kcadm delete realm failed\nError message: #{e.message}"
     end
@@ -223,7 +232,7 @@ Puppet::Type.type(:keycloak_protocol_mapper).provide(:kcadm, parent: Puppet::Pro
       t.close
       Puppet.debug(IO.read(t.path))
       begin
-        kcadm('update', "client-scopes/#{resource[:client_scope]}/protocol-mappers/models/#{id}", resource[:realm], t.path)
+        kcadm('update', "client-scopes/#{client_scope_name_to_id(resource[:client_scope], resource[:realm])}/protocol-mappers/models/#{id}", resource[:realm], t.path)
       rescue Puppet::ExecutionFailure => e
         raise Puppet::Error, "kcadm update component failed\nError message: #{e.message}"
       end
